@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ZeiNengJie – 首页</title>
+    <title>超级无敌屌炸天</title>
 
     <style>
         /* ===== 动态背景 ===== */
@@ -68,22 +68,52 @@
         }
 
         /* ===== 玻璃拟态卡片 ===== */
-        .card {
-            width: 320px;
-            margin: 40px auto;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.15);
-            box-shadow: 0 0 25px rgba(0,255,255,0.2);
-            transition: 0.4s;
-        }
+        /* 让卡片的内容垂直排列 */
+            .card {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            /* 图片容器 */
+            .img-box {
+                width: 100%;
+                height: 220px;
+                border-radius: 15px;
+                overflow: hidden;
+                transform-style: preserve-3d;
+                transition: transform 0.8s ease;
+            }
+            
+            /* 图片本体 */
+            .img-box img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            
+            /* 悬停旋转效果 */
+            .card:hover .img-box {
+                transform: perspective(600px) rotateY(15deg) rotateX(6deg) scale(1.04);
+            }
+            
+            /* 文字介绍区域 */
+            .info {
+                text-align: center;
+                margin-top: 20px;
+            }
+            
+            .info h3 {
+                margin: 0;
+                font-size: 22px;
+            }
+            
+            .info p {
+                margin-top: 10px;
+                font-size: 16px;
+                opacity: 0.9;
+            }
 
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 0 35px rgba(0,255,255,0.4);
-        }
 
         /* ===== 霓虹按钮 ===== */
         .btn {
@@ -121,20 +151,23 @@
     <div class="stars"></div>
 
     <div class="container">
-        <h1>贼能借 ZeiNengJie</h1>
+        <h1>LangGe</h1>
         <p class="subtitle">欢迎来到你的专属酷炫 GitHub 首页</p>
 
-        <div class="card">
-            <h2>🔥 关于本站</h2>
-            <p>
-                一个由 Vue + SpringBoot + 创意构建的项目集散地。  
-                持续更新中……
-            </p>
-            <a href="https://github.com/" class="btn">进入 GitHub</a>
-        </div>
+       <div class="card">
+            <div class="img-box">
+                <img src="https://i.postimg.cc/XqGQS1gF/sample.jpg" alt="图片" />
+            </div>
+
+            <div class="info">
+                <h3>图片标题</h3>
+                <p>这是图片的介绍文字，可以写内容说明或超链接介绍。</p>
+            </div>
+    </div>
     </div>
 
     <footer>© 2025 ZeiNengJie · All Rights Reserved</footer>
 
 </body>
 </html>
+
