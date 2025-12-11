@@ -199,7 +199,7 @@
     <div class="snake"></div>
 
     <div class="container">
-        <h1>阿豆特制 · 赛博炫酷主页</h1>
+        <h1>LangGe小游戏</h1>
 
         <div class="card-wrapper">
 
@@ -243,22 +243,64 @@
 
 
 <script>
-/* 打开游戏弹窗 */
+let currentGameLoop = null; // 游戏循环
+let currentGame = null; // 当前游戏类型
+
 function openGame(type) {
     document.getElementById("modal").classList.add("show");
+    currentGame = type;
+
     if (type === "snake") startSnake();
     if (type === "pong") startPong();
     if (type === "click") startClickGame();
 }
 
-/* 关闭游戏 */
 function closeGame() {
     document.getElementById("modal").classList.remove("show");
+
+    // 清理画面 + 清理循环
     const ctx = gameCanvas.getContext("2d");
-    ctx.clearRect(0,0,600,430);
+    ctx.clearRect(0, 0, 600, 430);
+
+    if (currentGameLoop) clearInterval(currentGameLoop);
+    currentGameLoop = null;
+    currentGame = null;
 }
 
-/* ====== 游戏 1：贪吃蛇 ====== */
+/* =======================
+   游戏结束统一弹窗
+======================== */
+function gameOver(reason) {
+    const ctx = gameCanvas.getContext("2d");
+
+    if (currentGameLoop) clearInterval(currentGameLoop);
+    currentGameLoop = null;
+
+    ctx.fillStyle = "rgba(0,0,0,0.65)";
+    ctx.fillRect(0, 0, 600, 430);
+
+    ctx.fillStyle = "cyan";
+    ctx.font = "28px Arial";
+    ctx.fillText("游戏结束", 220, 170);
+
+    ctx.fillStyle = "magenta";
+    ctx.font = "20px Arial";
+    ctx.fillText(reason, 220, 210);
+
+    ctx.fillStyle = "white";
+    ctx.fillText("点击重新开始", 200, 260);
+
+    // 点击重新开始
+    gameCanvas.onclick = () => {
+        if (currentGame === "snake") startSnake();
+        if (currentGame === "pong") startPong();
+        if (currentGame === "click") startClickGame();
+    };
+}
+
+/* =======================
+   游戏1：贪吃蛇 Neon Snake
+======================== */
 function startSnake() {
     const c = gameCanvas;
     const ctx = c.getContext("2d");
@@ -270,122 +312,144 @@ function startSnake() {
     let trail = [];
     let tail = 5;
 
-    document.onkeydown = function(e) {
-        switch(e.keyCode){
-            case 37: xv=-1; yv=0; break;
-            case 38: xv=0; yv=-1; break;
-            case 39: xv=1; yv=0; break;
-            case 40: xv=0; yv=1; break;
-        }
+    document.onkeydown = (e) => {
+        if (e.keyCode === 37) xv = -1, yv = 0;
+        if (e.keyCode === 38) xv = 0, yv = -1;
+        if (e.keyCode === 39) xv = 1, yv = 0;
+        if (e.keyCode === 40) xv = 0, yv = 1;
     };
 
-    const game = setInterval(() => {
-        ctx.fillStyle ="rgba(0,0,0,0.5)";
-        ctx.fillRect(0,0,c.width,c.height);
+    if (currentGameLoop) clearInterval(currentGameLoop);
 
-        px+=xv; py+=yv;
-        if(px<0)px=tc-1;
-        if(px>tc-1)px=0;
-        if(py<0)py=tc-1;
-        if(py>tc-1)py=0;
+    currentGameLoop = setInterval(() => {
+        ctx.fillStyle = "rgba(0,0,0,0.5)";
+        ctx.fillRect(0, 0, c.width, c.height);
 
-        ctx.fillStyle="cyan";
-        for(let i=0;i<trail.length;i++){
-            ctx.fillRect(trail[i].x*gs, trail[i].y*gs, gs-2, gs-2);
-            if(trail[i].x==px && trail[i].y==py) tail=5;
+        px += xv;
+        py += yv;
+
+        if (px < 0) px = tc - 1;
+        if (px > tc - 1) px = 0;
+        if (py < 0) py = tc - 1;
+        if (py > tc - 1) py = 0;
+
+        // 绘制蛇
+        ctx.fillStyle = "cyan";
+        for (let i = 0; i < trail.length; i++) {
+            ctx.fillRect(trail[i].x * gs, trail[i].y * gs, gs - 2, gs - 2);
+
+            // 撞到自己 → 死亡
+            if (trail[i].x === px && trail[i].y === py) {
+                gameOver("你撞到自己了！");
+                return;
+            }
         }
-        trail.push({x:px,y:py});
-        while(trail.length>tail) trail.shift();
 
-        if(ax==px && ay==py){
+        trail.push({ x: px, y: py });
+        while (trail.length > tail) trail.shift();
+
+        // 吃到果子
+        if (ax === px && ay === py) {
             tail++;
-            ax=Math.floor(Math.random()*tc);
-            ay=Math.floor(Math.random()*tc);
+            ax = Math.floor(Math.random() * tc);
+            ay = Math.floor(Math.random() * tc);
         }
 
-        ctx.fillStyle="magenta";
-        ctx.fillRect(ax*gs, ay*gs, gs-2, gs-2);
+        ctx.fillStyle = "magenta";
+        ctx.fillRect(ax * gs, ay * gs, gs - 2, gs - 2);
 
     }, 80);
 }
 
-/* ====== 游戏 2：乒乓球 ====== */
+/* =======================
+   游戏2：Cyber Pong
+======================== */
 function startPong() {
     const c = gameCanvas;
     const ctx = c.getContext("2d");
 
-    let ballX=300, ballY=200;
-    let ballVX=4, ballVY=3;
-
+    let ballX = 300, ballY = 200;
+    let ballVX = 4, ballVY = 3;
     let paddleX = 250;
 
-    c.onmousemove = e => {
+    c.onmousemove = (e) => {
         paddleX = e.offsetX - 50;
     };
 
-    setInterval(()=>{
-        ctx.fillStyle="#0008";
-        ctx.fillRect(0,0,600,430);
+    if (currentGameLoop) clearInterval(currentGameLoop);
 
-        ballX+=ballVX;
-        ballY+=ballVY;
+    currentGameLoop = setInterval(() => {
+        ctx.fillStyle = "#0008";
+        ctx.fillRect(0, 0, 600, 430);
 
-        if(ballX<0 || ballX>600) ballVX*=-1;
-        if(ballY<0) ballVY*=-1;
+        ballX += ballVX;
+        ballY += ballVY;
 
-        // paddle
-        ctx.fillStyle="cyan";
-        ctx.fillRect(paddleX, 400, 100, 10);
+        if (ballX < 0 || ballX > 600) ballVX *= -1;
+        if (ballY < 0) ballVY *= -1;
 
-        if(ballY>390 && ballX>paddleX && ballX<paddleX+100){
-            ballVY*=-1;
+        // 球掉下去 → 死亡
+        if (ballY > 430) {
+            gameOver("球掉下去了！");
+            return;
         }
 
-        ctx.fillStyle="magenta";
-        ctx.beginPath();
-        ctx.arc(ballX, ballY, 8, 0, Math.PI*2);
-        ctx.fill();
+        ctx.fillStyle = "cyan";
+        ctx.fillRect(paddleX, 400, 100, 10);
 
+        if (ballY > 390 && ballX > paddleX && ballX < paddleX + 100) {
+            ballVY *= -1;
+        }
+
+        ctx.fillStyle = "magenta";
+        ctx.beginPath();
+        ctx.arc(ballX, ballY, 8, 0, Math.PI * 2);
+        ctx.fill();
     }, 16);
 }
 
-/* ====== 游戏 3：点击反应速度 ====== */
+/* =======================
+   游戏3：反应速度测试
+======================== */
 function startClickGame() {
     const c = gameCanvas;
     const ctx = c.getContext("2d");
 
     let x, y;
     let startTime = 0;
+    let timeout = null;
 
     function newTarget() {
-        x = Math.random()*540+30;
-        y = Math.random()*360+30;
+        x = Math.random() * 540 + 30;
+        y = Math.random() * 360 + 30;
         startTime = Date.now();
 
-        ctx.clearRect(0,0,600,430);
-        ctx.fillStyle="magenta";
+        ctx.clearRect(0, 0, 600, 430);
+        ctx.fillStyle = "magenta";
         ctx.beginPath();
-        ctx.arc(x,y,20,0,Math.PI*2);
+        ctx.arc(x, y, 20, 0, Math.PI * 2);
         ctx.fill();
+
+        // 2 秒没点 → 死亡
+        timeout = setTimeout(() => {
+            gameOver("你反应太慢了！");
+        }, 2000);
     }
 
-    c.onclick = e => {
+    c.onclick = (e) => {
         const dx = e.offsetX - x;
         const dy = e.offsetY - y;
-        if(dx*dx+dy*dy <= 400){
-            const t = Date.now() - startTime;
-            ctx.fillStyle="cyan";
-            ctx.font="24px Arial";
-            ctx.fillText("反应时间："+t+" ms",200,200);
-
-            setTimeout(newTarget, 700);
+        if (dx * dx + dy * dy <= 400) {
+            clearTimeout(timeout);
+            newTarget();
         }
     };
 
     newTarget();
 }
-
 </script>
+
 
 </body>
 </html>
+
