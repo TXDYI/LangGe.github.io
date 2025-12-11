@@ -3,9 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>超级炫酷页面</title>
+    <title>超级炫酷页面 · 阿豆定制</title>
+
     <style>
-        /* ===== 全局基础 ===== */
         body {
             margin: 0;
             background: #05070A;
@@ -14,10 +14,10 @@
             color: #fff;
         }
 
-        /* ===== 动态渐变背景粒子 ===== */
-        @keyframes particles {
+        /* ===== 粒子背景 ===== */
+        @keyframes floatBG {
             0% { transform: translateY(0) translateX(-10px); }
-            50% { transform: translateY(-20px) translateX(10px); }
+            50% { transform: translateY(-20px) translateX(15px); }
             100% { transform: translateY(0) translateX(-10px); }
         }
 
@@ -25,12 +25,12 @@
             position: fixed;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle, rgba(0,255,255,0.15) 0%, rgba(0,0,0,0.8) 70%);
-            animation: particles 6s infinite ease-in-out;
+            background: radial-gradient(circle, rgba(0,255,255,0.15), #000 80%);
+            animation: floatBG 6s infinite ease-in-out;
             z-index: -1;
         }
 
-        /* ===== 顶部赛博蛇 ===== */
+        /* ===== 顶部霓虹蛇 ===== */
         .snake {
             position: fixed;
             top: 0;
@@ -39,7 +39,7 @@
             background: linear-gradient(90deg, cyan, #0ff, transparent);
             filter: drop-shadow(0 0 8px cyan);
             border-radius: 10px;
-            animation: snakeMove 3.8s infinite ease-in-out;
+            animation: snakeMove 4s infinite ease-in-out;
         }
 
         @keyframes snakeMove {
@@ -48,7 +48,7 @@
             100% { left: -200px; }
         }
 
-        /* ===== 标准页面布局 ===== */
+        /* 页面主体布局 */
         .container {
             width: 1200px;
             max-width: 92%;
@@ -62,7 +62,13 @@
             text-shadow: 0 0 15px cyan;
         }
 
-        /* ===== 玻璃卡片 ===== */
+        /* ===== 卡片样式 ===== */
+        .card-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
         .card {
             width: 330px;
             height: 360px;
@@ -79,17 +85,14 @@
             justify-content: center;
             align-items: center;
 
-            /* 3D 准备 */
             transform-style: preserve-3d;
         }
 
-        /* 卡片悬浮特效 */
         .card:hover {
             transform: perspective(800px) rotateY(14deg) rotateX(8deg) scale(1.06);
             box-shadow: 0 0 40px cyan;
         }
 
-        /* 卡片内部的 “图片替代动画块” */
         .fake-img {
             width: 100%;
             height: 200px;
@@ -106,24 +109,13 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* 说明文字 */
-        .info {
-            text-align: center;
-        }
-
         .info h3 {
             margin: 5px 0 10px;
             font-size: 22px;
+            text-align: center;
         }
 
-        /* =====布局：卡片水平排列 ===== */
-        .card-wrapper {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        /* ===== 超炫按钮 ===== */
+        /* 炫酷按钮 */
         .btn {
             margin-top: 30px;
             padding: 12px 22px;
@@ -138,7 +130,6 @@
             overflow: hidden;
         }
 
-        /* 按钮内部电流效果 */
         .btn::before {
             content: "";
             position: absolute;
@@ -160,50 +151,241 @@
             box-shadow: 0 0 20px cyan;
             color: #fff;
         }
+
+        /* ===== 弹窗 ===== */
+        .modal {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0; left: 0;
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+
+        .game-box {
+            width: 600px;
+            height: 450px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            box-shadow: 0 0 20px cyan;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px; right: 10px;
+            color: red;
+            cursor: pointer;
+            font-size: 22px;
+        }
+
+        /* =====小游戏 canvas===== */
+        canvas {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 12px;
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- 背景粒子层 -->
     <div class="particles"></div>
-
-    <!-- 顶部赛博蛇 -->
     <div class="snake"></div>
 
     <div class="container">
-
-        <h1>超级炫酷展示模块</h1>
+        <h1>阿豆特制 · 赛博炫酷主页</h1>
 
         <div class="card-wrapper">
+
+            <!-- 贪吃蛇 -->
             <div class="card">
                 <div class="fake-img"></div>
                 <div class="info">
-                    <h3>模块一</h3>
-                    <p>一个高质量、全动态、纯 CSS 的炫酷展示卡片。</p>
+                    <h3>贪吃蛇 · Neon Snake</h3>
+                    <button class="btn" onclick="openGame('snake')">开始游戏</button>
                 </div>
             </div>
 
+            <!-- 乒乓球 -->
             <div class="card">
                 <div class="fake-img"></div>
                 <div class="info">
-                    <h3>模块二</h3>
-                    <p>鼠标悬浮会 3D 翻转、发光、动态背景流动。</p>
+                    <h3>Cyber Pong</h3>
+                    <button class="btn" onclick="openGame('pong')">开始游戏</button>
                 </div>
             </div>
 
+            <!-- 点击反应速度游戏 -->
             <div class="card">
                 <div class="fake-img"></div>
                 <div class="info">
-                    <h3>模块三</h3>
-                    <p>适合 GitHub Pages 的酷炫主页或作品展示。</p>
+                    <h3>反应速度测试</h3>
+                    <button class="btn" onclick="openGame('click')">开始游戏</button>
                 </div>
             </div>
+
         </div>
-
-        <button class="btn">查看更多特效</button>
     </div>
 
-</body>
+    <!-- ===== 游戏弹窗 ===== -->
+    <div class="modal" id="modal">
+        <div class="game-box">
+            <div class="close-btn" onclick="closeGame()">✖</div>
+            <canvas id="gameCanvas" width="600" height="430"></canvas>
+        </div>
+    </div>
 
+
+<script>
+/* 打开游戏弹窗 */
+function openGame(type) {
+    document.getElementById("modal").classList.add("show");
+    if (type === "snake") startSnake();
+    if (type === "pong") startPong();
+    if (type === "click") startClickGame();
+}
+
+/* 关闭游戏 */
+function closeGame() {
+    document.getElementById("modal").classList.remove("show");
+    const ctx = gameCanvas.getContext("2d");
+    ctx.clearRect(0,0,600,430);
+}
+
+/* ====== 游戏 1：贪吃蛇 ====== */
+function startSnake() {
+    const c = gameCanvas;
+    const ctx = c.getContext("2d");
+
+    let px = 10, py = 10;
+    let gs = 20, tc = 20;
+    let ax = 15, ay = 15;
+    let xv = 0, yv = 0;
+    let trail = [];
+    let tail = 5;
+
+    document.onkeydown = function(e) {
+        switch(e.keyCode){
+            case 37: xv=-1; yv=0; break;
+            case 38: xv=0; yv=-1; break;
+            case 39: xv=1; yv=0; break;
+            case 40: xv=0; yv=1; break;
+        }
+    };
+
+    const game = setInterval(() => {
+        ctx.fillStyle ="rgba(0,0,0,0.5)";
+        ctx.fillRect(0,0,c.width,c.height);
+
+        px+=xv; py+=yv;
+        if(px<0)px=tc-1;
+        if(px>tc-1)px=0;
+        if(py<0)py=tc-1;
+        if(py>tc-1)py=0;
+
+        ctx.fillStyle="cyan";
+        for(let i=0;i<trail.length;i++){
+            ctx.fillRect(trail[i].x*gs, trail[i].y*gs, gs-2, gs-2);
+            if(trail[i].x==px && trail[i].y==py) tail=5;
+        }
+        trail.push({x:px,y:py});
+        while(trail.length>tail) trail.shift();
+
+        if(ax==px && ay==py){
+            tail++;
+            ax=Math.floor(Math.random()*tc);
+            ay=Math.floor(Math.random()*tc);
+        }
+
+        ctx.fillStyle="magenta";
+        ctx.fillRect(ax*gs, ay*gs, gs-2, gs-2);
+
+    }, 80);
+}
+
+/* ====== 游戏 2：乒乓球 ====== */
+function startPong() {
+    const c = gameCanvas;
+    const ctx = c.getContext("2d");
+
+    let ballX=300, ballY=200;
+    let ballVX=4, ballVY=3;
+
+    let paddleX = 250;
+
+    c.onmousemove = e => {
+        paddleX = e.offsetX - 50;
+    };
+
+    setInterval(()=>{
+        ctx.fillStyle="#0008";
+        ctx.fillRect(0,0,600,430);
+
+        ballX+=ballVX;
+        ballY+=ballVY;
+
+        if(ballX<0 || ballX>600) ballVX*=-1;
+        if(ballY<0) ballVY*=-1;
+
+        // paddle
+        ctx.fillStyle="cyan";
+        ctx.fillRect(paddleX, 400, 100, 10);
+
+        if(ballY>390 && ballX>paddleX && ballX<paddleX+100){
+            ballVY*=-1;
+        }
+
+        ctx.fillStyle="magenta";
+        ctx.beginPath();
+        ctx.arc(ballX, ballY, 8, 0, Math.PI*2);
+        ctx.fill();
+
+    }, 16);
+}
+
+/* ====== 游戏 3：点击反应速度 ====== */
+function startClickGame() {
+    const c = gameCanvas;
+    const ctx = c.getContext("2d");
+
+    let x, y;
+    let startTime = 0;
+
+    function newTarget() {
+        x = Math.random()*540+30;
+        y = Math.random()*360+30;
+        startTime = Date.now();
+
+        ctx.clearRect(0,0,600,430);
+        ctx.fillStyle="magenta";
+        ctx.beginPath();
+        ctx.arc(x,y,20,0,Math.PI*2);
+        ctx.fill();
+    }
+
+    c.onclick = e => {
+        const dx = e.offsetX - x;
+        const dy = e.offsetY - y;
+        if(dx*dx+dy*dy <= 400){
+            const t = Date.now() - startTime;
+            ctx.fillStyle="cyan";
+            ctx.font="24px Arial";
+            ctx.fillText("反应时间："+t+" ms",200,200);
+
+            setTimeout(newTarget, 700);
+        }
+    };
+
+    newTarget();
+}
+
+</script>
+
+</body>
 </html>
