@@ -1,174 +1,209 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>超级无敌屌炸天</title>
 
+<head>
+    <meta charset="UTF-8">
+    <title>超级炫酷页面</title>
     <style>
-        /* ===== 动态背景 ===== */
+        /* ===== 全局基础 ===== */
         body {
             margin: 0;
-            padding: 0;
+            background: #05070A;
+            font-family: "Segoe UI", sans-serif;
             overflow-x: hidden;
-            font-family: "Microsoft YaHei", sans-serif;
-            background: radial-gradient(circle at center, #0a0f29, #000);
-            height: 100vh;
-            color: white;
+            color: #fff;
         }
 
-        /* 星空背景粒子 */
-        .stars {
+        /* ===== 动态渐变背景粒子 ===== */
+        @keyframes particles {
+            0% { transform: translateY(0) translateX(-10px); }
+            50% { transform: translateY(-20px) translateX(10px); }
+            100% { transform: translateY(0) translateX(-10px); }
+        }
+
+        .particles {
             position: fixed;
             width: 100%;
             height: 100%;
+            background: radial-gradient(circle, rgba(0,255,255,0.15) 0%, rgba(0,0,0,0.8) 70%);
+            animation: particles 6s infinite ease-in-out;
             z-index: -1;
-            background: transparent url('https://i.postimg.cc/CLXp6V2v/stars.png') repeat;
-            animation: animateStars 60s linear infinite;
         }
 
-        @keyframes animateStars {
-            from {
-                background-position: 0 0;
-            }
-            to {
-                background-position: -2000px 2000px;
-            }
+        /* ===== 顶部赛博蛇 ===== */
+        .snake {
+            position: fixed;
+            top: 0;
+            width: 180px;
+            height: 8px;
+            background: linear-gradient(90deg, cyan, #0ff, transparent);
+            filter: drop-shadow(0 0 8px cyan);
+            border-radius: 10px;
+            animation: snakeMove 3.8s infinite ease-in-out;
         }
 
-        /* ===== 内容容器 ===== */
+        @keyframes snakeMove {
+            0% { left: -200px; }
+            50% { left: calc(100% - 50px); }
+            100% { left: -200px; }
+        }
+
+        /* ===== 标准页面布局 ===== */
         .container {
-            text-align: center;
-            margin-top: 150px;
+            width: 1200px;
+            max-width: 92%;
+            margin: 120px auto 50px;
         }
 
-        /* ===== 霓虹标题 ===== */
         h1 {
-            font-size: 60px;
-            font-weight: 700;
-            letter-spacing: 4px;
-            text-shadow: 0 0 12px #00eaff, 0 0 25px #00eaff;
-            animation: glow 2s ease-in-out infinite alternate;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 42px;
+            text-shadow: 0 0 15px cyan;
         }
 
-        @keyframes glow {
-            from {
-                text-shadow: 0 0 8px #00eaff, 0 0 15px #00eaff;
-            }
-            to {
-                text-shadow: 0 0 18px #00ffff, 0 0 35px #00ffff;
-            }
+        /* ===== 玻璃卡片 ===== */
+        .card {
+            width: 330px;
+            height: 360px;
+            padding: 25px;
+            margin: 20px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.15);
+            transition: 0.4s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            /* 3D 准备 */
+            transform-style: preserve-3d;
         }
 
-        /* ===== 介绍文字 ===== */
-        .subtitle {
+        /* 卡片悬浮特效 */
+        .card:hover {
+            transform: perspective(800px) rotateY(14deg) rotateX(8deg) scale(1.06);
+            box-shadow: 0 0 40px cyan;
+        }
+
+        /* 卡片内部的 “图片替代动画块” */
+        .fake-img {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(130deg, #0ff, #00aaff, #0066ff);
+            background-size: 300% 300%;
+            border-radius: 12px;
+            animation: slidebg 6s infinite linear;
+            margin-bottom: 20px;
+        }
+
+        @keyframes slidebg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 说明文字 */
+        .info {
+            text-align: center;
+        }
+
+        .info h3 {
+            margin: 5px 0 10px;
             font-size: 22px;
-            opacity: 0.8;
-            margin-top: 10px;
         }
 
-        /* ===== 玻璃拟态卡片 ===== */
-        /* 让卡片的内容垂直排列 */
-            .card {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            /* 图片容器 */
-            .img-box {
-                width: 100%;
-                height: 220px;
-                border-radius: 15px;
-                overflow: hidden;
-                transform-style: preserve-3d;
-                transition: transform 0.8s ease;
-            }
-            
-            /* 图片本体 */
-            .img-box img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-            
-            /* 悬停旋转效果 */
-            .card:hover .img-box {
-                transform: perspective(600px) rotateY(15deg) rotateX(6deg) scale(1.04);
-            }
-            
-            /* 文字介绍区域 */
-            .info {
-                text-align: center;
-                margin-top: 20px;
-            }
-            
-            .info h3 {
-                margin: 0;
-                font-size: 22px;
-            }
-            
-            .info p {
-                margin-top: 10px;
-                font-size: 16px;
-                opacity: 0.9;
-            }
+        /* =====布局：卡片水平排列 ===== */
+        .card-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
 
-
-        /* ===== 霓虹按钮 ===== */
+        /* ===== 超炫按钮 ===== */
         .btn {
-            display: inline-block;
-            padding: 14px 36px;
-            background: linear-gradient(120deg, #00eaff, #007bff);
-            border-radius: 30px;
-            color: black;
+            margin-top: 30px;
+            padding: 12px 22px;
             font-size: 18px;
-            font-weight: bold;
-            text-decoration: none;
-            margin-top: 20px;
-            box-shadow: 0 0 15px #00eaff;
-            transition: 0.3s;
+            border-radius: 10px;
+            background: transparent;
+            border: 2px solid cyan;
+            color: cyan;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 按钮内部电流效果 */
+        .btn::before {
+            content: "";
+            position: absolute;
+            width: 140%;
+            height: 140%;
+            background: linear-gradient(90deg, transparent, cyan, transparent);
+            top: -20%;
+            left: -60%;
+            transform: rotate(12deg);
+            animation: btnFlow 1.6s infinite linear;
+        }
+
+        @keyframes btnFlow {
+            0% { left: -60%; }
+            100% { left: 120%; }
         }
 
         .btn:hover {
-            box-shadow: 0 0 25px #00ffff;
-            transform: scale(1.08);
-        }
-
-        /* ===== 底部版权 ===== */
-        footer {
-            position: fixed;
-            bottom: 20px;
-            width: 100%;
-            text-align: center;
-            opacity: 0.6;
+            box-shadow: 0 0 20px cyan;
+            color: #fff;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="stars"></div>
+    <!-- 背景粒子层 -->
+    <div class="particles"></div>
+
+    <!-- 顶部赛博蛇 -->
+    <div class="snake"></div>
 
     <div class="container">
-        <h1>LangGe</h1>
-        <p class="subtitle">欢迎来到你的专属酷炫 GitHub 首页</p>
 
-       <div class="card">
-            <div class="img-box">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1WJah7fV0WQTM1F55bxWialhgwRia765iLQ&s" alt="图片" />
+        <h1>超级炫酷展示模块</h1>
+
+        <div class="card-wrapper">
+            <div class="card">
+                <div class="fake-img"></div>
+                <div class="info">
+                    <h3>模块一</h3>
+                    <p>一个高质量、全动态、纯 CSS 的炫酷展示卡片。</p>
+                </div>
             </div>
 
-            <div class="info">
-                <h3>图片标题</h3>
-                <p>这是图片的介绍文字，可以写内容说明或超链接介绍。</p>
+            <div class="card">
+                <div class="fake-img"></div>
+                <div class="info">
+                    <h3>模块二</h3>
+                    <p>鼠标悬浮会 3D 翻转、发光、动态背景流动。</p>
+                </div>
             </div>
-    </div>
-    </div>
 
-    <footer>© 2025 ZeiNengJie · All Rights Reserved</footer>
+            <div class="card">
+                <div class="fake-img"></div>
+                <div class="info">
+                    <h3>模块三</h3>
+                    <p>适合 GitHub Pages 的酷炫主页或作品展示。</p>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn">查看更多特效</button>
+    </div>
 
 </body>
+
 </html>
-
-
