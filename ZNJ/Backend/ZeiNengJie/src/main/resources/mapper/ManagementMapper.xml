@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.zeinengjie.mapper.ManagementMapper">
+
+    <resultMap id="UserList" type="com.example.zeinengjie.pojo.derive.UserListItem">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_Time"/>
+        <result property="Userdescription" column="Userdescription"/>
+        <result property="phone" column="phone"/>
+        <result property="mail" column="mail"/>
+    </resultMap>
+
+    <select id="getUsers" resultMap="UserList">
+        SELECT * FROM users LIMIT #{page},#{pageSize}
+    </select>
+
+    <resultMap id="getAllGameOrderInformationList" type="com.example.zeinengjie.pojo.derive.AllGameOrder">
+        <id property="id" column="id"/>
+        <result property="gameName" column="game_name"/>
+        <result property="orderTime" column="order_time"/>
+        <result property="username" column="username"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <select id="getAllGameOrderInformation" resultMap="getAllGameOrderInformationList">
+        SELECT g.id,g.game_name,g.order_time,u.username,u.`status`
+        from games g
+                 JOIN users u on g.username = u.id
+        WHERE g.games_status=0
+        ORDER BY id DESC LIMIT #{page},#{pageSize}
+    </select>
+
+    <update id="upGameAllStatus" parameterType="java.lang.String">
+        UPDATE gameall SET authorization = authorization - 1 WHERE gameall_name = #{gameName};
+    </update>
+    <update id="upGameAllStatus2" parameterType="java.lang.String">
+        UPDATE gameall SET leisure = leisure + 1 WHERE gameall_name = #{gameName};
+    </update>
+
+    <update id="UpGameAllLeisureJian" parameterType="java.lang.String">
+        UPDATE gameall SET leisure = leisure - 1 WHERE gameall_name = #{gameName};
+    </update>
+
+    <update id="UpGameAllLeisureknown" parameterType="java.lang.String">
+        UPDATE gameall SET known = known - 1 WHERE gameall_name = #{gameName};
+    </update>
+
+    <update id="UpGameAllLeisureendOrderNub" parameterType="java.lang.String">
+        UPDATE gameall SET endOrderNub = endOrderNub + 1 WHERE gameall_name = #{gameName};
+    </update>
+
+    <resultMap id="gameList" type="com.example.zeinengjie.pojo.derive.OrderManageAdmin">
+        <id property="id" column="id"/>
+        <result property="gameName" column="game_name"/>
+        <result property="gameCharacterName" column="game_character_name"/>
+        <result property="gameTag" column="game_tag"/>
+        <result property="username" column="username"/>
+        <result property="gameStatus" column="games_status"/>
+        <result property="money" column="money"/>
+        <result property="orderTime" column="order_time"/>
+    </resultMap>
+    <select id="getAllOrderAdmin" resultMap="gameList">
+        SELECT g.id, g.game_name, g.game_character_name, g.game_tag, u.username, g.games_status, g.money, g.order_time
+        FROM games g
+        JOIN users u ON g.username = u.id
+        <where>
+            <if test="orderId != -1">
+                AND g.id = #{orderId}
+            </if>
+            <if test="GameName != null and GameName != ''">
+                AND g.game_name LIKE CONCAT('%', #{GameName}, '%')
+            </if>
+            AND g.games_status &lt;=2
+        </where>
+        ORDER BY g.id DESC
+        LIMIT #{page}, #{pageSize}
+    </select>
+
+    <select id="getAllOrderAdminPageCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM games
+        <where>
+            <if test="orderId != -1">
+                AND id = #{orderId}
+            </if>
+            <if test="GameName != null and GameName != ''">
+                AND game_name LIKE CONCAT('%', #{GameName}, '%')
+            </if>
+            AND games_status &lt;=2
+        </where>
+    </select>
+
+    <resultMap id="getGameAllList" type="com.example.zeinengjie.pojo.GameAll">
+        <id property="gameallId" column="gameall_id"/>
+        <result property="gameallName" column="gameall_name"/>
+        <result property="gameallClass" column="gameall_class"/>
+        <result property="os" column="os"/>
+        <result property="known" column="known"/>
+        <result property="leisure" column="leisure"/>
+        <result property="authorization" column="authorization"/>
+        <result property="endOrderNub" column="endOrderNub"/>
+    </resultMap>
+
+    <select id="getGameAll" resultMap="getGameAllList">
+        SELECT * FROM gameall
+        <where>
+            <if test="gameName != null and gameName != ''">
+                AND gameall_name = #{gameName}
+            </if>
+        </where>
+    </select>
+    <update id="SettingExposureShow">
+        UPDATE exposure SET exposure_show = #{show} WHERE id_exposure = #{id}
+    </update>
+    <insert id="addExposure">
+        INSERT INTO exposure (title_text, explain_text, exposure_img,exposure_show)
+        VALUES (#{name}, #{advert}, #{cover},'F')
+    </insert>
+    <update id="updatePwd" parameterType="map" >
+        UPDATE users SET password = MD5(#{newPassword}) WHERE password = MD5(#{oldPassword}) and username = #{User}
+    </update>
+</mapper>

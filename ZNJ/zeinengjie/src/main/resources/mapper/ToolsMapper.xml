@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.zeinengjie.mapper.ToolsMapper">
+    <update id="inspect" parameterType="java.lang.Integer">
+        UPDATE games
+        SET games_status = 3
+        WHERE id = #{id}
+    </update>
+
+    <select id="returnIdList" resultType="int">
+        SELECT g.id
+        FROM games g
+        JOIN leaseorder l ON l.games_id = g.id
+        WHERE l.end_time &lt; NOW() AND leaseorder_status = 0
+    </select>
+    <resultMap id="getLeaseOrderList" type="com.example.zeinengjie.pojo.LeaseOrder">
+        <id property="leaseOrderId" column="leaseorder_id"/>
+        <result property="usersId" column="users_id"/>
+        <result property="leaseorderStatus" column="leaseorder_status"/>
+        <result property="gamesId" column="games_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="leaseorderMoney" column="leaseorder_money"/>
+        <result property="endTime" column="end_time"/>
+    </resultMap>
+
+    <select id="getLeaseOrder" resultMap="getLeaseOrderList">
+        SELECT *
+        FROM leaseorder
+        WHERE games_id = #{OrderId}
+    </select>
+
+    <update id="addMoney" parameterType="java.lang.Integer">
+        UPDATE moneyall
+        SET users_money = users_money + (
+            SELECT leaseorder_money
+            FROM leaseorder
+            WHERE leaseorder_id = #{LeaseId}
+        )
+        WHERE users_id = #{Userid};
+    </update>
+
+
+
+
+    <update id="UpDateLeaseorderStatus" parameterType="java.lang.Integer">
+        UPDATE leaseorder
+        SET leaseorder_status = 1
+        WHERE leaseorder_id = #{LeaseId}
+    </update>
+</mapper>

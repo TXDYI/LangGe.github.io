@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.zeinengjie.mapper.BackgroundManageMapper">
+
+
+    <resultMap id="UserRentingTableList" type="com.example.zeinengjie.pojo.derive.UserRentingTable">
+        <id property="id" column="id"/>
+        <result property="gameName" column="game_name"/>
+        <result property="orderTime" column="order_time"/>
+        <result property="money" column="money"/>
+        <result property="gamesStatus" column="games_status"/>
+    </resultMap>
+
+    <select id="getUserRentingTable" resultMap="UserRentingTableList">
+        SELECT id,game_name,order_time,money,games_status FROM games
+        WHERE username IN (SELECT id FROM users WHERE username = #{userName})
+        ORDER BY id DESC
+            LIMIT #{page},#{pageSize};
+    </select>
+
+    <resultMap id="UserLeaseTableList" type="com.example.zeinengjie.pojo.derive.UserLeaseTable">
+        <id property="id" column="id"/>
+        <result property="gameName" column="game_name"/>
+        <result property="createTime" column="create_time"/>
+        <result property="leaseorderMoney" column="leaseorder_money"/>
+        <result property="gamesStatus" column="games_status"/>
+        <result property="leaseorderStatus" column="leaseorder_status"/>
+        <result property="endTime" column="end_time"/>
+    </resultMap>
+
+    <select id="getUserLeaseTable" resultMap="UserLeaseTableList">
+        SELECT g.id,g.game_name,l.leaseorder_status,l.create_time,l.leaseorder_money,g.games_status,l.end_time
+        FROM leaseorder l
+                 JOIN games g ON l.games_id = g.id
+        WHERE l.users_id IN (SELECT id FROM users WHERE username = #{userName})
+        ORDER BY id DESC
+            LIMIT #{page},#{pageSize};
+
+    </select>
+
+
+
+
+    <select id="getUserRentingTableCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM games
+        WHERE username IN (SELECT id FROM users WHERE username = #{userName});
+    </select>
+
+    <select id="getUserLeaseTableCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM leaseorder
+        WHERE users_id IN (SELECT id FROM users WHERE username = #{userName});
+    </select>
+
+    <select id="getGameClass" resultType="java.lang.String">
+        SELECT gameall_class FROM gameall WHERE gameall_name = #{gameName};
+    </select>
+
+    <update id="statisticsAddAuthorizationCommodity" parameterType="java.lang.String">
+        UPDATE gameall SET authorization = authorization + 1 WHERE gameall_name = #{gameName};
+    </update>
+
+    <insert id="shoppingAddOrder" parameterType="map">
+        INSERT INTO leaseorder(games_id,users_id,leaseorder_money,end_time,leaseorder_status)
+        VALUES(#{order.orderId},#{userId},#{order.money},#{endTime},#{order.leaseorderStatus})
+    </insert>
+
+    <update id="updateGameStatus" parameterType="map">
+        UPDATE games SET games_status = #{gameStatus} WHERE id = #{id}
+    </update>
+
+    <update id="upGameAllStatus3" parameterType="java.lang.String">
+        UPDATE gameall SET known = known + 1 WHERE gameall_name = #{gameName};
+    </update>
+    <insert id="insertRentingOrder" parameterType="map">
+        INSERT INTO rentingorder(games_id,users_id,rentingorder_money) VALUES(#{gameId},#{userId},#{money})
+    </insert>
+
+    <select id="getRentalIncome" resultType="java.lang.Integer">
+        SELECT SUM(l.leaseorder_money)
+        from rentingorder as r
+                 INNER JOIN leaseorder as l on r.games_id = l.games_id
+        WHERE l.leaseorder_status = 1
+          and r.users_id = #{userId}
+    </select>
+    <select id="getRentalOrder" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        from rentingorder as r
+                 INNER JOIN leaseorder as l on r.games_id = l.games_id
+        WHERE l.leaseorder_status = 1
+          and r.users_id = #{userId}
+    </select>
+    <select id="LeasingExpenditure" resultType="java.lang.Integer">
+        SELECT SUM(l.leaseorder_money)  from leaseorder as l  WHERE l.leaseorder_status = 1 and l.users_id = #{userId}
+    </select>
+    <select id="LeasingOrder" resultType="java.lang.Integer">
+        SELECT COUNT(*) from leaseorder as l  WHERE l.leaseorder_status = 1 and l.users_id = #{userId}
+    </select>
+
+    <update id="upOrderStatus" parameterType="map">
+        UPDATE games SET games_status = 1 WHERE id = #{orderId} and username = #{UserID}
+    </update>
+    <delete id="UserDeleteOrder" parameterType="map">
+        DELETE FROM games WHERE id = #{orderId} and username = #{UserID} and games_status = #{status}
+    </delete>
+</mapper>
